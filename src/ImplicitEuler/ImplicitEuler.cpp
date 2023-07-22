@@ -60,6 +60,11 @@ bool ImplicitEuler::projectedNewton(const Eigen::VectorXd &xt, Eigen::VectorXd &
     xtt = x;
     energy_after_ = energy;
 
+    if (der_.violateDBC(xt, xtt)) {
+        spdlog::error("DBC violated!");
+        return false;
+    }
+
     return true;
 }
 

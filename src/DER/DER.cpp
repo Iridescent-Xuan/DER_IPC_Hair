@@ -584,21 +584,6 @@ void DER::incrementalPotential(const Eigen::VectorXd &x, double h,
 void DER::deepUpdate(const std::vector<Eigen::Vector3d> &vertices, const std::vector<double> gammas, double h) {
     assert(vertices.size() == num_vertices_ && gammas.size() == num_edges_);
 
-    for (auto v : DBC_vertices_) {
-        if (validVertexIndex(v)) {
-            if ((vertices[v] - vertices_[v]).norm() > 1e-8) {
-                spdlog::warn("DBC vertex {} is not fixed!", v);
-            }
-        }
-    }
-    for (auto i : DBC_gammas_) {
-        if (validEdgeIndex(i)) {
-            if (fabs(gammas[i] - gammas_[i]) > 1e-8) {
-                spdlog::warn("DBC gamma {} is not fixed!", i);
-            }
-        }
-    }
-
     update(vertices, gammas,
            reference_frames1_, reference_frames2_,
            material_frames1_, material_frames2_,
@@ -897,6 +882,50 @@ Eigen::Vector3d DER::bboxSize() const {
     }
 
     return Eigen::Vector3d(max_x - min_x, max_y - min_y, max_z - min_z);
+}
+
+bool DER::violateDBC(const std::vector<Eigen::Vector3d> &vertices_t, const std::vector<double> &gammas_t,
+                     const std::vector<Eigen::Vector3d> &vertices_tt, const std::vector<double> &gammas_tt) const {
+    assert(vertices_t.size() == num_vertices_ && gammas_t.size() == num_edges_);
+    assert(vertices_tt.size() == num_vertices_ && gammas_tt.size() == num_edges_);
+
+    bool violate = false;
+    for (auto v : DBC_vertices_) {
+        if (validVertexIndex(v)) {
+            if ((vertices_t[v] - vertices_tt[v]).norm() > 1e-8) {
+                spdlog::warn("DBC vertex {} is not fixed!", v);
+                violate = true;
+            }
+        }
+    }
+    for (auto i : DBC_gammas_) {
+        if (validEdgeIndex(i)) {
+            if (fabs(gammas_t[i] - gammas_tt[i]) > 1e-8) {
+                spdlog::warn("DBC gamma {} is not fixed!", i);
+                violate = true;
+            }
+        }
+    }
+    return violate;
+}
+
+bool DER::violateDBC(const Eigen::VectorXd &x_t, const Eigen::VectorXd &x_tt) const {
+    assert(x_t.size() == 3 * num_vertices_ + num_edges_);
+    assert(x_tt.size() == 3 * num_vertices_ + num_edges_);
+
+    std::vector<Eigen::Vector3d> vertices_t(num_vertices_);
+    std::vector<double> gammas_t(num_edges_);
+    std::vector<Eigen::Vector3d> vertices_tt(num_vertices_);
+    std::vector<double> gammas_tt(num_edges_);
+    for (int i = 0; i < num_vertices_; ++i) {
+        vertices_t[i] = x_t.segment<3>(3 * i);
+        vertices_tt[i] = x_tt.segment<3>(3 * i);
+    }
+    for (int i = 0; i < num_edges_; ++i) {
+        gammas_t[i] = x_t(3 * num_vertices_ + i);
+        gammas_tt[i] = x_tt(3 * num_vertices_ + i);
+    }
+    return violateDBC(vertices_t, gammas_t, vertices_tt, gammas_tt);
 }
 
 } // namespace xuan

@@ -91,6 +91,9 @@ public:
     void getVertices(std::vector<Eigen::Vector3d> &vertices) const {
         vertices = vertices_;
     }
+    void getGammas(std::vector<double> &gammas) const {
+        gammas = gammas_;
+    }
     Eigen::Vector3d bboxSize() const;
 
     // output
@@ -104,6 +107,11 @@ public:
         mass_ = mass;
         gravity_ = gravity;
     }
+
+    // check DBC
+    bool violateDBC(const std::vector<Eigen::Vector3d> &vertices_t, const std::vector<double> &gammas_t,
+                    const std::vector<Eigen::Vector3d> &vertices_tt, const std::vector<double> &gammas_tt) const;
+    bool violateDBC(const Eigen::VectorXd &x_t, const Eigen::VectorXd &x_tt) const;
 
 private:
     // helper functions
