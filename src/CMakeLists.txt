@@ -1,0 +1,4 @@
+add_subdirectory(DER)
+add_subdirectory(LinearSolver)
+add_subdirectory(ImplicitEuler)
+add_subdirectory(HairFactory)
