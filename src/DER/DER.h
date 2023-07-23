@@ -100,11 +100,11 @@ public:
     void writeOBJ(const std::string &filename) const;
 
     // set parameters
-    void setParameters(const double &ks, const double &kb, const double &kt, const double &mass = 1.0, const Eigen::Vector3d &gravity = Eigen::Vector3d(0.0, 0.0, -9.8)) {
+    void setParameters(const double &ks, const double &kb, const double &kt, const double &density = 1.0, const Eigen::Vector3d &gravity = Eigen::Vector3d(0.0, 0.0, -9.8)) {
         ks_ = ks;
         kb_ = kb;
         kt_ = kt;
-        mass_ = mass;
+        density_ = density;
         gravity_ = gravity;
     }
 
@@ -187,9 +187,10 @@ private:
     std::vector<double> undeformed_gammas_;
     std::vector<double> reference_twists_;
     // constants
-    double ks_ = 1000.0, kb_ = 0.00001, kt_ = 0.001; // TODO: tune these parameters
+    double ks_ = 1e3, kb_ = 1e-3, kt_ = 3e-3; // TODO: tune these parameters
     size_t num_vertices_, num_edges_;
-    double mass_ = 1.0;
+    double density_ = 1.0;
+    double radius_ = 1e-3;
     Eigen::Vector3d gravity_ = Eigen::Vector3d(0.0, 0.0, -9.8);
     // indices to the DBC
     std::vector<size_t> DBC_vertices_, DBC_gammas_;

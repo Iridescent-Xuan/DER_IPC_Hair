@@ -44,6 +44,8 @@ DER::DER(const std::vector<Eigen::Vector3d> vertices, const std::vector<double> 
         }
     }
     undeformed_kappas_ = kappas_;
+    undeformed_voronoi_lengths_[0] = edges_[0].norm();
+    undeformed_voronoi_lengths_[num_vertices_ - 1] = edges_[num_vertices_ - 2].norm();
     for (int i = 1; i < num_vertices_ - 1; ++i) {
         undeformed_voronoi_lengths_[i] = (edges_[i].norm() + edges_[i - 1].norm()) / 2.0;
     }
@@ -517,8 +519,8 @@ double DER::kineticEnergy(const std::vector<Eigen::Vector3d> &vertices, double h
     assert(vertices.size() == num_vertices_);
     double energy = 0.0;
     for (int i = 0; i < num_vertices_; ++i) {
-        Eigen::Vector3d x_hat = vertices_[i] + h * velocitys_[i] + h * h / mass_ * gravity_; // the only external force is gravity
-        energy += 0.5 * mass_ * (vertices[i] - x_hat).squaredNorm();
+        Eigen::Vector3d x_hat = vertices_[i] + h * velocitys_[i] + h * h * gravity_; // the only external force is gravity
+        energy += 0.5 * density_ * undeformed_voronoi_lengths_[i] * (vertices[i] - x_hat).squaredNorm();
     }
     return energy;
 }
@@ -532,8 +534,8 @@ void DER::kineticGradient(const std::vector<Eigen::Vector3d> &vertices, double h
     }
     assert(gradient.size() == 3 * num_vertices_ + num_edges_);
     for (int i = 0; i < num_vertices_; ++i) {
-        Eigen::Vector3d x_hat = vertices_[i] + h * velocitys_[i] + h * h / mass_ * gravity_;
-        gradient.segment<3>(3 * i) += mass_ * (vertices[i] - x_hat);
+        Eigen::Vector3d x_hat = vertices_[i] + h * velocitys_[i] + h * h * gravity_;
+        gradient.segment<3>(3 * i) += density_ * undeformed_voronoi_lengths_[i] * (vertices[i] - x_hat);
     }
 }
 
@@ -541,7 +543,7 @@ void DER::kineticHessian(Eigen::SparseMatrix<double> &hessian) {
     std::vector<Eigen::Triplet<double>> hessian_triplets;
     for (int i = 0; i < num_vertices_; ++i) {
         for (int j = 0; j < 3; ++j) {
-            hessian_triplets.emplace_back(3 * i + j, 3 * i + j, mass_);
+            hessian_triplets.emplace_back(3 * i + j, 3 * i + j, density_ * undeformed_voronoi_lengths_[i]);
         }
     }
     if (hessian.size() == 0) {

@@ -46,7 +46,8 @@ bool ImplicitEuler::projectedNewton(const Eigen::VectorXd &xt, Eigen::VectorXd &
 
         energy_pre = energy;
         x_pre = x;
-        if (grad.lpNorm<Eigen::Infinity>() < tol) {
+        double grad_norm = grad.lpNorm<Eigen::Infinity>();
+        if (grad_norm < tol) {
             spdlog::debug("----Converged!");
             break;
         }
@@ -80,7 +81,7 @@ bool ImplicitEuler::advanceOneTimeStep(const std::vector<Eigen::Vector3d> vertic
 
     Eigen::VectorXd xtt;
     Eigen::Vector3d bbox = der_.bboxSize();
-    double tol = 1e-6 * bbox.squaredNorm() * h_ * h_;
+    double tol = 1e-4 * bbox.squaredNorm();
     if (!projectedNewton(xt, xtt, std::sqrt(tol))) {
         spdlog::error("Failed to advance for the next time step!");
         return false;
