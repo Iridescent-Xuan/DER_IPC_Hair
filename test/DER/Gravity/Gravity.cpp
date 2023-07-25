@@ -1,6 +1,6 @@
 #include <DER/DER.h>
 #include <path.h>
-#include <ImplicitEuler/ImplicitEuler.h>
+#include <ImplicitEuler/ImplicitEulerDER.h>
 #include <LinearSolver/EigenSolver.h>
 
 #include <spdlog/spdlog.h>
@@ -36,7 +36,7 @@ int main() {
     spdlog::info("DER created! {} vertices, {} DBC vertices, {} DBC gammas", der.numVertices(), der.numDBCVertices(), der.numDBCGammas());
 
     EigenCongugateGradientSolver solver;
-    ImplicitEuler implicit_euler(der, solver);
+    ImplicitEulerDER implicit_euler(der, solver);
 
     std::string output_dir = ROOT_PATH + std::string("/test/DER/Gravity/output/");
     spdlog::info("Output directory: {}", output_dir);

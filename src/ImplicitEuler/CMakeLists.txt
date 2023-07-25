@@ -8,7 +8,8 @@ target_compile_features(${target_name}
 )
 target_sources(${target_name}
     PUBLIC
-    ImplicitEuler.cpp
+    ImplicitEulerDER.cpp
+    ImplicitEulerHairFactory.cpp
 )
 target_include_directories(${target_name}
     PUBLIC
@@ -20,5 +21,6 @@ target_link_libraries(${target_name}
     spdlog::spdlog
     
     xuan::DER 
+    xuan::HairFactory
     xuan::LinearSolver
 )

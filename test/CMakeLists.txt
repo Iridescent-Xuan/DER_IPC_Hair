@@ -1,1 +1,2 @@
 add_subdirectory(DER)
+add_subdirectory(HairFactory)

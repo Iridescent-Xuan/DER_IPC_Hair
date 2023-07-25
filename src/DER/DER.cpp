@@ -844,23 +844,39 @@ void DER::fillMatrix11d(const Eigen::Matrix3d &dd_ec_ec, const Eigen::Matrix3d &
     result(10, 9) += dd_gamma_c_gamma_p;
 }
 
-void DER::writeOBJ(const std::string &filename) const {
+void DER::writeOBJ(const std::string &filename, size_t offset) const {
     std::ofstream out(filename);
     if (!out.is_open()) {
         spdlog::warn("DER::writeOBJ: cannot open file {}", filename);
         return;
     }
 
-    for (int i = 0; i < num_vertices_; ++i) {
+    for (size_t i = 0; i < num_vertices_; ++i) {
         out << "v " << vertices_[i].x() << " " << vertices_[i].y() << " " << vertices_[i].z() << std::endl;
     }
     out << "l";
-    for (int i = 0; i < num_vertices_; ++i) {
-        out << " " << i + 1;
+    for (size_t i = 0; i < num_vertices_; ++i) {
+        out << " " << i + 1 + offset;
     }
     out << std::endl;
     out.close();
     spdlog::debug("DER::writeOBJ: write to file {}", filename);
+}
+
+void DER::writeOBJ(std::ofstream &out, size_t offset) const {
+    if (!out.is_open()) {
+        spdlog::warn("DER::writeOBJ: cannot open file");
+        return;
+    }
+
+    for (size_t i = 0; i < num_vertices_; ++i) {
+        out << "v " << vertices_[i].x() << " " << vertices_[i].y() << " " << vertices_[i].z() << std::endl;
+    }
+    out << "l";
+    for (size_t i = 0; i < num_vertices_; ++i) {
+        out << " " << i + 1 + offset;
+    }
+    out << std::endl;
 }
 
 Eigen::Vector3d DER::bboxSize() const {

@@ -1,6 +1,6 @@
 #include <DER/DER.h>
 #include <path.h>
-#include <ImplicitEuler/ImplicitEuler.h>
+#include <ImplicitEuler/ImplicitEulerDER.h>
 #include <LinearSolver/EigenSolver.h>
 
 #include <spdlog/spdlog.h>
@@ -42,7 +42,7 @@ int main() {
     der.setParameters(3e3, 6e-3, 1e-2);
 
     EigenCongugateGradientSolver solver;
-    ImplicitEuler implicit_euler(der, solver);
+    ImplicitEulerDER implicit_euler(der, solver);
 
     std::string output_dir = ROOT_PATH + std::string("/test/DER/Curly/output/");
     spdlog::info("Output directory: {}", output_dir);

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -91,13 +92,36 @@ public:
     void getVertices(std::vector<Eigen::Vector3d> &vertices) const {
         vertices = vertices_;
     }
+    void getVertices(Eigen::MatrixXd &vertices) const {
+        vertices.resize(num_vertices_, 3);
+        for (size_t i = 0; i < num_vertices_; i++) {
+            vertices.row(i) = vertices_[i];
+        }
+    }
     void getGammas(std::vector<double> &gammas) const {
         gammas = gammas_;
     }
+    void getVariables(Eigen::VectorXd &x) const {
+        if (x.size() == 0) {
+            x.resize(numVariables());
+        }
+        assert(x.size() == numVariables());
+
+        for (size_t i = 0; i < num_vertices_; i++) {
+            x.segment<3>(3 * i) = vertices_[i];
+        }
+        for (size_t i = 0; i < num_edges_; i++) {
+            x(num_vertices_ * 3 + i) = gammas_[i];
+        }
+    }
     Eigen::Vector3d bboxSize() const;
+    double getRadius() const {
+        return radius_;
+    }
 
     // output
-    void writeOBJ(const std::string &filename) const;
+    void writeOBJ(const std::string &filename, size_t offset = 0) const;
+    void writeOBJ(std::ofstream &out, size_t offset = 0) const;
 
     // set parameters
     void setParameters(const double &ks, const double &kb, const double &kt, const double &density = 1.0, const Eigen::Vector3d &gravity = Eigen::Vector3d(0.0, 0.0, -9.8)) {

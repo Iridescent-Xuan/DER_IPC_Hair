@@ -1,4 +1,4 @@
-#include "ImplicitEuler.h"
+#include "ImplicitEulerDER.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/stopwatch.h>
@@ -8,7 +8,7 @@
 
 namespace xuan {
 
-bool ImplicitEuler::projectedNewton(const Eigen::VectorXd &xt, Eigen::VectorXd &xtt, double tol, int max_iter) {
+bool ImplicitEulerDER::projectedNewton(const Eigen::VectorXd &xt, Eigen::VectorXd &xtt, double tol, int max_iter) {
     spdlog::debug("Enter projected Newton loop...");
     assert(xt.size() == der_.numVariables());
 
@@ -69,7 +69,7 @@ bool ImplicitEuler::projectedNewton(const Eigen::VectorXd &xt, Eigen::VectorXd &
     return true;
 }
 
-bool ImplicitEuler::advanceOneTimeStep(const std::vector<Eigen::Vector3d> vertices, const std::vector<double> gammas) {
+bool ImplicitEulerDER::advanceOneTimeStep(const std::vector<Eigen::Vector3d> vertices, const std::vector<double> gammas) {
     assert(vertices.size() == der_.numVertices() && gammas.size() == der_.numEdges());
     Eigen::VectorXd xt = Eigen::VectorXd::Zero(der_.numVariables());
     for (int i = 0; i < vertices.size(); ++i) {
