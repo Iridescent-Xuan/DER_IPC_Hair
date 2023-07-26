@@ -116,6 +116,61 @@ void HairFactory::generateHair(double radius, double curliness, int vertices_per
     spdlog::info("HairFactory::generateHair: {} hairs generated", hairs_.size());
 }
 
+void HairFactory::generateHair(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, const Eigen::MatrixXd &N,
+                               double radius, double curliness, int vertices_per_strand, double length) {
+    assert(V.rows() == N.rows() && V.cols() == N.cols());
+    // triangle mesh only
+    assert(F.cols() == 3);
+
+    V_head_ = V;
+    F_head_ = F;
+
+    // generate edges
+    std::set<std::pair<size_t, size_t>> edge_set;
+    for (int i = 0; i < F_head_.rows(); ++i) {
+        for (int j = 0; j < 3; ++j) {
+            size_t v1 = F_head_(i, j);
+            size_t v2 = F_head_(i, (j + 1) % 3);
+            if (v1 > v2) {
+                std::swap(v1, v2);
+            }
+            edge_set.insert(std::make_pair(v1, v2));
+        }
+    }
+    E_head_.resize(edge_set.size(), 2);
+    size_t edge_id = 0;
+    for (const auto &edge : edge_set) {
+        E_head_.row(edge_id++) = Eigen::Vector2i(edge.first, edge.second);
+    }
+    assert(edge_id == E_head_.rows());
+
+    // generate hairs
+    for (size_t i = 0; i < V.rows(); ++i) {
+        if (N.row(i).norm() < 1e-6) {
+            continue;
+        }
+        generateOneHairSrand(V.row(i), N.row(i), vertices_per_strand, length, radius, curliness);
+        hair_roots_.push_back(i);
+    }
+
+    dhat_ = 0.0;
+    num_variables_ = 0;
+    num_hair_vertices_ = 0;
+    num_hair_edges_ = 0;
+    for (const auto &hair : hairs_) {
+        dhat_ += hair.getRadius();
+        num_variables_ += hair.numVariables();
+        num_hair_vertices_ += hair.numVertices();
+        num_hair_edges_ += hair.numEdges();
+    }
+    dhat_ /= hairs_.size();
+    dhat_ *= num_hair_vertices_ / hairs_.size();
+
+    generateCollisionMesh();
+
+    spdlog::info("HairFactory::generateHair: {} hairs generated", hairs_.size());
+}
+
 void HairFactory::writeOBJ(const std::string &filename) const {
     std::ofstream out(filename);
     if (!out.is_open()) {

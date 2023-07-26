@@ -8,4 +8,6 @@ I tried hard to adjust the parameters, but still the curly hair would be stretch
 
 ## IPC
 
-...
+Employ the [ipc-toolkit](https://github.com/ipc-sim/ipc-toolkit).
+
+Too slow ＞﹏＜.

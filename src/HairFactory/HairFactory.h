@@ -19,6 +19,10 @@ public:
     // TODO: generate hair from a given obj file
     void generateHair(const std::string &obj_path) {}
 
+    // generate hair from given sources
+    void generateHair(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, const Eigen::MatrixXd &N,
+                      double radius = 0.0, double curliness = 0.0, int vertices_per_strand = 15, double length = 1.0);
+
     // generate hair from a unit sphere
     void generateHair(double radius = 0.0, double curliness = 0.0, int vertices_per_strand = 15, double length = 1.0, int resolution_theta = 20, int resolution_phi = 10);
 

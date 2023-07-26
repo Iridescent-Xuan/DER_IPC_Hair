@@ -26,7 +26,7 @@ int main() {
     EigenCongugateGradientSolver solver;
     ImplicitEulerHairFactory implicit_euler(hair_factory, solver);
 
-    std::string output_dir = ROOT_PATH + std::string("/test/HairFactory/output/");
+    std::string output_dir = ROOT_PATH + std::string("/test/HairFactory/SphereHead/output/");
     spdlog::info("Output directory: {}", output_dir);
     hair_factory.writeOBJ(output_dir + "hairsim0.obj");
 
