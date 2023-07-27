@@ -10,4 +10,6 @@ I tried hard to adjust the parameters, but still the curly hair would be stretch
 
 Employ the [ipc-toolkit](https://github.com/ipc-sim/ipc-toolkit).
 
-Too slow ＞﹏＜.
+## BUG！
+
+I should not have broken the linear system apart and solved it individually for each hair! It is incorrect and this may be where my bug lies. (But I have no time and energy to fix it now ＞﹏＜.)
